@@ -1,0 +1,8 @@
+.vscode
+build
+
+# tex
+*.aux
+*.log
+
+tests
