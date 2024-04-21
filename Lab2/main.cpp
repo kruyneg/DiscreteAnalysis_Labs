@@ -346,6 +346,8 @@ private:
         }
         target->left = target->right = nullptr;
         delete target;
+        if (_m_head)
+            _m_head->color = black;
     }
 
 
