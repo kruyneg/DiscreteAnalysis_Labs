@@ -6,3 +6,6 @@ build
 *.log
 
 tests
+
+gmon.out
+lab2
