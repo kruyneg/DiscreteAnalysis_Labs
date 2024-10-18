@@ -1,30 +1,31 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
 #include <functional>
+#include <iostream>
 #include <list>
+#include <unordered_set>
+#include <vector>
 
 using graph_t = std::vector<std::vector<int64_t>>;
 
-bool have_cycles(const graph_t& graph, const std::unordered_set<int64_t>& starts) {
+bool have_cycles(const graph_t& graph,
+                 const std::unordered_set<int64_t>& starts) {
     std::vector<int8_t> visited(graph.size(), 0);
     bool result = false;
-    std::function<void(int64_t)> dfs = 
-        [&result, &visited, &graph, &dfs] (int64_t cur) {
-            if (result) {
-                return;
-            }
-            if (visited[cur] == 1) {
-                result = true;
-                return;
-            }
-            visited[cur] = 1;
-            for (const auto& next : graph[cur]) {
-                dfs(next);
-            }
-            visited[cur] = 2;
+    std::function<void(int64_t)> dfs = [&result, &visited, &graph,
+                                        &dfs](int64_t cur) {
+        if (result) {
             return;
-        };
+        }
+        if (visited[cur] == 1) {
+            result = true;
+            return;
+        }
+        visited[cur] = 1;
+        for (const auto& next : graph[cur]) {
+            dfs(next);
+        }
+        visited[cur] = 2;
+        return;
+    };
     for (const auto& start : starts) {
         dfs(start);
     }
@@ -43,7 +44,8 @@ int main() {
     for (int64_t i = 0; i < m; ++i) {
         int64_t a, b;
         std::cin >> a >> b;
-        --a; --b;
+        --a;
+        --b;
         starts.erase(b);
         g[a].push_back(b);
     }
@@ -56,22 +58,21 @@ int main() {
         std::cout << -1 << std::endl;
         return 0;
     }
-    
+
     std::list<int64_t> seq;
     std::vector<char> visited(n, false);
-    std::function<void(int64_t)> dfs = 
-        [&seq, &g, &visited, &dfs] (int64_t cur) {
-            if (visited[cur]) {
-                return;
-            }
-            visited[cur] = true;
+    std::function<void(int64_t)> dfs = [&seq, &g, &visited, &dfs](int64_t cur) {
+        if (visited[cur]) {
+            return;
+        }
+        visited[cur] = true;
 
-            for (const auto& next : g[cur]) {
-                dfs(next);
-            }
-            seq.push_front(cur);
-        };
-    
+        for (const auto& next : g[cur]) {
+            dfs(next);
+        }
+        seq.push_front(cur);
+    };
+
     for (const auto& start : starts) {
         dfs(start);
     }

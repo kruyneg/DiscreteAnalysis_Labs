@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 
-void __count_sort(std::vector<std::pair<std::string, std::string>>& arr, uint index) {
+void __count_sort(std::vector<std::pair<std::string, std::string>>& arr,
+                  uint index) {
     std::vector<unsigned int> counter('Z' - '0' + 1, 0);
     for (auto& [key, val] : arr) {
         ++counter[key[index] - '0'];
@@ -38,8 +39,8 @@ std::pair<std::string, std::string> parse(const std::string& str) {
 
 int main() {
     std::ios::sync_with_stdio(false);
-	std::cin.tie(0);
-	std::cout.tie(0);
+    std::cin.tie(0);
+    std::cout.tie(0);
 
     std::vector<std::pair<std::string, std::string>> array;
     std::string line;

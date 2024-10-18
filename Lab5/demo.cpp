@@ -1,5 +1,5 @@
-#include "SuffTree.hpp"
 #include <iostream>
+#include "SuffTree.hpp"
 
 // для тестирования скорости построения дерева
 

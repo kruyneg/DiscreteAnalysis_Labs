@@ -1,11 +1,14 @@
-#include<iostream>
-#include<vector>
-#include<unordered_map>
-#include<algorithm>
-#include<fstream>
-#include<functional>
+#include <algorithm>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
 
-#define fast_io std::ios::sync_with_stdio(false); std::cin.tie(0); std::cout.tie(0);
+#define fast_io                       \
+    std::ios::sync_with_stdio(false); \
+    std::cin.tie(0);                  \
+    std::cout.tie(0);
 
 std::ostream& operator<<(std::ostream& out, const std::vector<int64_t>& vec) {
     for (auto& elem : vec) {
@@ -14,8 +17,8 @@ std::ostream& operator<<(std::ostream& out, const std::vector<int64_t>& vec) {
     return out;
 }
 
-template<class Iterator>
-std::vector<int64_t> __Z (Iterator first, Iterator last) {
+template <class Iterator>
+std::vector<int64_t> __Z(Iterator first, Iterator last) {
     if (first == last) {
         return {};
     }
@@ -27,7 +30,8 @@ std::vector<int64_t> __Z (Iterator first, Iterator last) {
         if (std::next(first, i) <= r) {
             z[i] = std::min(z[i - (l - first)], (r - first) - i + 1);
         }
-        while (i + z[i] < size && *std::next(first, i + z[i]) == *std::next(first, z[i])) {
+        while (i + z[i] < size &&
+               *std::next(first, i + z[i]) == *std::next(first, z[i])) {
             ++z[i];
         }
         if (i + z[i] - 1 > r - first) {
@@ -36,10 +40,10 @@ std::vector<int64_t> __Z (Iterator first, Iterator last) {
         }
     }
     return z;
-
 }
 
-std::unordered_map<char, std::vector<int64_t>> __bad_symbol(const std::string& str) {
+std::unordered_map<char, std::vector<int64_t>> __bad_symbol(
+    const std::string& str) {
     std::unordered_map<char, std::vector<int64_t>> result;
     for (int64_t i = 0; i < str.size(); ++i) {
         result[str[i]].push_back(i);
@@ -52,8 +56,7 @@ std::vector<int64_t> __good_suf(const std::string& str) {
     std::reverse(n.begin(), n.end());
     std::vector<int64_t> L(str.size(), -1);
     for (int64_t i = 0; i < n.size(); ++i) {
-        if (n[i] != 0)
-            L[L.size() - n[i]] = i;
+        if (n[i] != 0) L[L.size() - n[i]] = i;
     }
     std::vector<int64_t>& l = n;
     l = __Z(str.begin(), str.end());
@@ -72,7 +75,7 @@ std::vector<int64_t> __good_suf(const std::string& str) {
 }
 
 int64_t __binsearch(int64_t l, int64_t r, std::function<bool(int64_t)> check) {
-    while(l != r) {
+    while (l != r) {
         int64_t m = (l + r) / 2;
         if (check(m)) {
             r = m;
@@ -83,14 +86,16 @@ int64_t __binsearch(int64_t l, int64_t r, std::function<bool(int64_t)> check) {
     return l;
 }
 
-int64_t __get_offset_bs(const std::unordered_map<char, std::vector<int64_t>>& table, char symbol, int64_t index) {
+int64_t __get_offset_bs(
+    const std::unordered_map<char, std::vector<int64_t>>& table, char symbol,
+    int64_t index) {
     if (!table.contains(symbol)) {
         return index + 1;
     }
     const std::vector<int64_t>& vals = table.at(symbol);
-    auto result_ind = __binsearch(0, vals.size(), [&vals, index](int64_t ind) -> bool {
-        return vals[ind] >= index;
-    });
+    auto result_ind = __binsearch(
+        0, vals.size(),
+        [&vals, index](int64_t ind) -> bool { return vals[ind] >= index; });
     --result_ind;
     if (result_ind == -1 || vals[result_ind] >= index) {
         return index + 1;
@@ -106,7 +111,8 @@ int64_t __get_offset_gs(const std::vector<int64_t>& vals, int64_t index) {
     return vals.size() - vals[index] - 1;
 }
 
-std::vector<int64_t> boyer_moore(const std::string& pattern, const std::string & text) {
+std::vector<int64_t> boyer_moore(const std::string& pattern,
+                                 const std::string& text) {
     if (pattern.size() > text.size()) {
         return {};
     }
@@ -117,11 +123,12 @@ std::vector<int64_t> boyer_moore(const std::string& pattern, const std::string &
     int64_t p_edge = t_edge;
     while (t_edge < text.size()) {
         int64_t t_ind = t_edge, p_ind = p_edge;
-        for (;p_ind >= 0 && text[t_ind] == pattern[p_ind]; --t_ind, --p_ind);
+        for (; p_ind >= 0 && text[t_ind] == pattern[p_ind]; --t_ind, --p_ind);
         if (p_ind == -1) {
             result.push_back(t_ind + 1);
         }
-        t_edge += std::max({1L, __get_offset_bs(bsr, text[t_ind], p_ind), __get_offset_gs(gsr, p_ind)});
+        t_edge += std::max({1L, __get_offset_bs(bsr, text[t_ind], p_ind),
+                            __get_offset_gs(gsr, p_ind)});
         p_edge = pattern.size() - 1;
     }
     return result;
@@ -130,12 +137,13 @@ std::vector<int64_t> boyer_moore(const std::string& pattern, const std::string &
 int main() {
     fast_io;
 
-    // std::fstream fin("/home/kruyneg/Programming/DiscreteAnalysis_Labs/Lab4/500.txt");
+    // std::fstream
+    // fin("/home/kruyneg/Programming/DiscreteAnalysis_Labs/Lab4/500.txt");
 
     std::string pattern, text;
     pattern.push_back(' ');
     char c;
-    while(c != '\n') {
+    while (c != '\n') {
         std::cin.get(c);
         if (c == ' ' || c == '\t') {
             if (pattern.back() != ' ') {
@@ -154,7 +162,7 @@ int main() {
     int64_t curword = 1;
     std::unordered_map<int64_t, std::pair<int64_t, int64_t>> indexes;
     text.push_back(' ');
-    while(std::cin.get(c)) {
+    while (std::cin.get(c)) {
         if (c == ' ' || c == '\t') {
             if (text.back() != ' ') {
                 ++curword;
@@ -176,6 +184,7 @@ int main() {
     text.push_back(' ');
     std::vector<int64_t> answer = boyer_moore(pattern, text);
     for (const auto& index : answer) {
-        std::cout << indexes[index + 1].first << ", " << indexes[index + 1].second << '\n';
+        std::cout << indexes[index + 1].first << ", "
+                  << indexes[index + 1].second << '\n';
     }
 }

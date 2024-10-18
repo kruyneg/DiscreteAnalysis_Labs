@@ -1,17 +1,12 @@
 #include <iostream>
-#include <vector>
 #include <list>
+#include <vector>
 
-// using cost_data = std::pair<int64_t, int64_t>; // cost_sum | amount
 using cost_data = int64_t;
-
-// inline std::ostream& operator<<(std::ostream& out, const cost_data& data) {
-//     return out << data.first << ',' << data.second;
-// }
 
 void print(const std::vector<std::vector<cost_data>>& matrix) {
     std::cout << '\t';
-    for (int i = 0; i < matrix.size(); ++i){
+    for (int i = 0; i < matrix.size(); ++i) {
         std::cout << i << '\t';
     }
     std::cout << '\n';
@@ -34,14 +29,9 @@ int main() {
         std::cin >> w >> c;
     }
 
-    std::vector< std::vector<std::vector<cost_data>> >
-        dp(
-            n + 1,
-            std::vector<std::vector<cost_data>>(
-                n + 1,
-                std::vector<cost_data>(m + 1, 0)
-            )
-        );
+    std::vector<std::vector<std::vector<cost_data>>> dp(
+        n + 1, std::vector<std::vector<cost_data>>(
+                   n + 1, std::vector<cost_data>(m + 1, 0)));
 
     for (size_t k = 1; k <= n; ++k) {
         const auto& dp_prev = dp[k - 1];
@@ -57,17 +47,11 @@ int main() {
                         new_cost = cost;
                     } else {
                         if (dp_prev[i - 1][w - weight] != 0)
-                            new_cost = (dp_prev[i - 1][w - weight] / (k - 1) + cost) * k;
+                            new_cost =
+                                (dp_prev[i - 1][w - weight] / (k - 1) + cost) *
+                                k;
                     }
                     dp_cur[i][w] = std::max(dp_cur[i - 1][w], new_cost);
-
-                    // if ((dp[i - 1][w - weight].first + cost) * (dp[i - 1][w - weight].second + 1) >=
-                    //         (dp[i - 1][w].first * dp[i - 1][w].second)
-                    // ) {
-                    //     dp[i][w] = {dp[i - 1][w - weight].first + cost, dp[i - 1][w - weight].second + 1};
-                    // } else {
-                    //     dp[i][w] = dp[i - 1][w];
-                    // }
                 }
             }
         }
@@ -96,6 +80,8 @@ int main() {
             --i;
         }
     }
-    for (const auto& elem : answer) { std::cout << elem << ' '; }
+    for (const auto& elem : answer) {
+        std::cout << elem << ' ';
+    }
     std::cout << std::endl;
 }
