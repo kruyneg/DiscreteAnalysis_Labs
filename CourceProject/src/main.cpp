@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-const double EPS = __DBL_MIN__;
+const double EPS = std::numeric_limits<double>::epsilon();
 
 class NaiveBayes01 {
    public:
@@ -17,7 +17,8 @@ class NaiveBayes01 {
         auto doc = __prepare_doc(document);
 
         std::unordered_map<std::string, size_t> word_counter;
-        std::vector<std::unordered_map<std::string, size_t>> class_counter(2);
+        std::vector<std::unordered_map<std::string, size_t>> class_counter(
+            2, std::unordered_map<std::string, size_t>{});
         std::vector<size_t> class_amount(2, 0);
         for (size_t i = 0; i < doc.size(); ++i) {
             class_amount[classes[i]] += doc[i].size();
@@ -46,7 +47,7 @@ class NaiveBayes01 {
         auto doc = __prepare_doc(document);
 
         for (size_t i = 0; i < doc.size(); ++i) {
-            double max_score = -__DBL_MAX__;
+            double max_score = -std::numeric_limits<double>::max();
             int8_t best_class;
             for (int8_t c = 0; c < 2; ++c) {
                 double score = std::log(c == 0 ? 1 - _m_true_probability
@@ -61,7 +62,7 @@ class NaiveBayes01 {
                         _m_conditional_probability[c].at(word);
                     }
                 }
-                std::cout << (int)c << " log: " << score << std::endl;
+                // std::cout << (int)c << " log: " << score << std::endl;
                 if (score > max_score) {
                     max_score = score;
                     best_class = c;
@@ -97,7 +98,9 @@ class NaiveBayes01 {
             ss >> word;
             std::transform(word.begin(), word.end(), word.begin(), tolower);
 
-            result.push_back(std::move(word));
+            if (word != "") {
+                result.push_back(std::move(word));
+            }
         }
         return result;
     }
@@ -109,22 +112,28 @@ class NaiveBayes01 {
 
 int main() {
     NaiveBayes01 classifier;
-    classifier.learn({"Cats and dogs are friends.", "Mouse hiding from cat.",
-                      "I play football with my friends.",
-                      "Our football team is called the March cats."},
-                     {0, 0, 1, 1});
 
-    auto res = classifier.predict({"Mouse eats cheese next to cats",
-                                   "I have friends on another football team."});
-    // classifier.learn({"Chinese Beijing Chinese", "Chinese Chinese
-    // Shanghai",
-    //                   "Chinese Macao", "Tokyo Japan Chinese"},
-    //                  {1, 1, 1, 0});
-    // auto res = classifier.predict({"Chinese Chinese Chinese Tokyo
-    // Japan"});
-
-    for (int elem : res) {
-        std::cout << elem << ' ';
+    int train, test;
+    std::cin >> train >> test;
+    std::vector<std::string> train_data(train);
+    std::vector<int8_t> train_classes(train);
+    for (size_t i = 0; i < train; ++i) {
+        int n;
+        std::cin >> n;
+        train_classes[i] = n;
+        std::cin.ignore(1);
+        std::getline(std::cin, train_data[i]);
     }
-    std::cout << std::endl;
+
+    classifier.learn(train_data, train_classes);
+
+    while (test--) {
+        std::string text;
+        std::getline(std::cin, text);
+
+        // std::vector<std::string> test_data;
+        // test_data.push_back()
+        auto res = classifier.predict(std::vector<std::string>{text});
+        std::cout << (int)res.front() << std::endl;
+    }
 }
