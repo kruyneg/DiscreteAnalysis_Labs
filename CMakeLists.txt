@@ -8,5 +8,6 @@ add_subdirectory(Lab4)
 add_subdirectory(Lab5)
 add_subdirectory(Lab7)
 add_subdirectory(Lab8)
+add_subdirectory(Lab9)
 
-add_subdirectory(CourceProject)
+add_subdirectory(CourseProject)
