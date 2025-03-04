@@ -77,20 +77,43 @@ class Parser {
 
         std::shared_ptr<std::istream> input{&std::cin, [](auto) {}};
         if (varmap.count("input")) {
-            input.reset(new std::ifstream(varmap["input"].as<std::string>()),
-                        [](std::istream* ptr) { delete ptr; });
-        }
-        std::shared_ptr<std::ostream> output{&std::cout, [](auto) {}};
-        if (varmap.count("output")) {
-            output.reset(new std::ofstream(varmap["output"].as<std::string>()),
-                         [](std::ostream* ptr) { delete ptr; });
-        }
-        std::shared_ptr<std::istream> stats{&std::cin, [](auto) {}};
-        if (varmap.count("stats")) {
-            stats.reset(new std::ifstream(varmap["stats"].as<std::string>()),
-                        [](std::istream* ptr) { delete ptr; });
+            auto input_path = varmap["input"].as<std::string>();
+            std::cout << "Input file: " << input_path << '\n';
+            auto file = new std::ifstream(input_path);
+            if (!file->is_open()) {
+                delete file;
+                throw std::runtime_error("Failed to open input file: " +
+                                         input_path);
+            }
+            input.reset(file, [](std::istream* ptr) { delete ptr; });
         }
 
+        std::shared_ptr<std::ostream> output{&std::cout, [](auto) {}};
+        if (varmap.count("output")) {
+            auto output_path = varmap["output"].as<std::string>();
+            std::cout << "Output file: " << output_path << '\n';
+            auto file = new std::ofstream(output_path);
+            if (!file->is_open()) {
+                delete file;
+                throw std::runtime_error("Failed to open output file: " +
+                                         output_path);
+            }
+            output.reset(file, [](std::ostream* ptr) { delete ptr; });
+        }
+
+        std::shared_ptr<std::istream> stats{&std::cin, [](auto) {}};
+        if (varmap.count("stats")) {
+            auto stats_path = varmap["stats"].as<std::string>();
+            std::cout << "Stats file: " << stats_path << '\n';
+            auto file = new std::ifstream(stats_path);
+            if (!file->is_open()) {
+                delete file;
+                throw std::runtime_error("Failed to open stats file: " +
+                                         stats_path);
+            }
+            stats.reset(file, [](std::istream* ptr) { delete ptr; });
+        }
+        
         Options res{command, input, output, stats};
         return res;
     }

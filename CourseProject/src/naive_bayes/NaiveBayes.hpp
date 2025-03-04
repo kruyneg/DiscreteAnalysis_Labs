@@ -14,9 +14,9 @@ class NaiveBayes {
           _m_class_probability(number_of_classes) {}
 
     void learn(const std::vector<std::string>& document,
-               const std::vector<size_t>& classes);
+               const std::vector<std::vector<size_t>>& classes);
 
-    std::vector<size_t> predict(
+    std::vector<std::vector<size_t>> predict(
         const std::vector<std::string>& document) const;
 
     void save(std::ostream&) const;

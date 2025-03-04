@@ -1,8 +1,8 @@
 #include "NaiveBayes.hpp"
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 std::vector<std::string> __split_and_clean(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), [](char c) {
@@ -36,7 +36,7 @@ std::vector<std::vector<std::string>> __prepare_doc(
 }
 
 void NaiveBayes::learn(const std::vector<std::string>& document,
-                       const std::vector<size_t>& classes) {
+                       const std::vector<std::vector<size_t>>& classes) {
     auto doc = __prepare_doc(document);
     auto classes_num = _m_class_probability.size();
 
@@ -48,16 +48,21 @@ void NaiveBayes::learn(const std::vector<std::string>& document,
     std::vector<size_t> class_amount(classes_num, 0);
 
     for (size_t i = 0; i < doc.size(); ++i) {
-        class_amount[classes[i]] += doc[i].size();
-        for (const auto& word : doc[i]) {
-            ++class_counter[classes[i]][word];
-            ++word_counter[word];
+        for (const auto& cls : classes[i]) {
+            class_amount[cls] += doc[i].size();
+            for (const auto& word : doc[i]) {
+                ++class_counter[cls][word];
+                ++word_counter[word];
+            }
         }
     }
 
     for (size_t c = 0; c < classes_num; ++c) {
         double nc = std::count_if(classes.begin(), classes.end(),
-                                  [c](size_t elem) { return elem == c; });
+                                  [c](const std::vector<size_t>& elem) {
+                                      return std::find(elem.begin(), elem.end(),
+                                                       c) != elem.end();
+                                  });
         _m_class_probability[c] = nc / classes.size();
     }
 
@@ -70,15 +75,16 @@ void NaiveBayes::learn(const std::vector<std::string>& document,
     }
 }
 
-std::vector<size_t> NaiveBayes::predict(
+std::vector<std::vector<size_t>> NaiveBayes::predict(
     const std::vector<std::string>& document) const {
-    std::vector<size_t> classes(document.size());
+    std::vector<std::vector<size_t>> classes(document.size());
     auto doc = __prepare_doc(document);
     size_t classes_num = _m_class_probability.size();
 
     for (size_t i = 0; i < doc.size(); ++i) {
         double max_score = -std::numeric_limits<double>::max();
-        int8_t best_class;
+        double sum_pred = 0;
+        std::vector<double> scores;
         for (int8_t c = 0; c < classes_num; ++c) {
             double score = std::log(_m_class_probability[c]);
             for (const auto& word : doc[i]) {
@@ -88,13 +94,16 @@ std::vector<size_t> NaiveBayes::predict(
                     score += std::log(_m_conditional_probability[c].at(word));
                 }
             }
-            // std::cout << (int)c << " log: " << score << std::endl;
-            if (score > max_score) {
-                max_score = score;
-                best_class = c;
+            sum_pred += score;
+            scores.push_back(score);
+        }
+
+        double avg_score = sum_pred / classes_num;
+        for (int c = 0; c < classes_num; ++c) {
+            if (scores[c] > avg_score) {
+                classes[i].push_back(c);
             }
         }
-        classes[i] = best_class;
     }
     return classes;
 }
